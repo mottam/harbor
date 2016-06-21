@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"github.com/elo7/harbor/config"
 	"github.com/elo7/harbor/execute"
-	"os"
 	"time"
 )
 
-func Build(imageName string, tags []string) error {
-	cwd, _ := os.Getwd()
+func Build(imageName string, tags []string, projectPath string) error {
 
 	if len(tags) == 0 {
 		timeBasedTag := createTimeBasedVersion(time.Now())
@@ -22,7 +20,7 @@ func Build(imageName string, tags []string) error {
 
 	imageWithTagsList := createImageWithTagsList(imageName, tags)
 
-	if err := runDockerCommand("build", "-t", imageWithTagsList[0], cwd); err != nil {
+	if err := runDockerCommand("build", "-t", imageWithTagsList[0], projectPath); err != nil {
 		return err
 	}
 

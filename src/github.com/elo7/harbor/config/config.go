@@ -29,14 +29,15 @@ type HarborConfig struct {
 		Region	 string
 	}
 	DownloadPath string `yaml:",omitempty"`
+	ProjectPath  string `yaml:",omitempty"`
 	Files        []HarborFile
 	Commands     []string
 }
 
-func Load(cliConfigVars commandline.ConfigVarsMap) (HarborConfig, error) {
+func Load(cliConfigVars commandline.ConfigVarsMap, projectPath string) (HarborConfig, error) {
 	harborConfig := HarborConfig{}
 
-	configFile, err := LoadFile()
+	configFile, err := LoadFile(projectPath)
 	if err != nil {
 		return harborConfig, err
 	}
@@ -45,6 +46,8 @@ func Load(cliConfigVars commandline.ConfigVarsMap) (HarborConfig, error) {
 
 	err = yaml.Unmarshal(configFile, &harborConfig)
 
+	harborConfig.ProjectPath = projectPath
+
 	if err != nil {
 		return harborConfig, err
 	}
@@ -52,6 +55,6 @@ func Load(cliConfigVars commandline.ConfigVarsMap) (HarborConfig, error) {
 	return harborConfig, nil
 }
 
-func LoadFile() ([]byte, error) {
-	return ioutil.ReadFile("harbor.yml")
+func LoadFile(projectPath string) ([]byte, error) {
+	return ioutil.ReadFile(projectPath + "/harbor.yml")
 }

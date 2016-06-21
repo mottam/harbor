@@ -32,15 +32,17 @@ func FromS3(harborConfig config.HarborConfig) error {
 			return err
 		}
 
+		fullDownloadPath := harborConfig.ProjectPath + "/" + harborConfig.DownloadPath
+
 		fmt.Printf("--- Downloading from bucket: %s\r\n", harborConfig.S3.Bucket)
 		fmt.Printf("--- Bucket region is set to %s\r\n", region.Name)
 		fmt.Printf("--- Files to be downloaded: %d\r\n", fileListLength)
-		fmt.Printf("--- Downloading to: %s\r\n", harborConfig.DownloadPath)
+		fmt.Printf("--- Downloading to: %s\r\n", fullDownloadPath)
 		for key, value := range harborConfig.Files {
 			fmt.Printf("--- Downloading file %d of %d...\r\n", key+1, fileListLength)
 
 			// TODO: Enable custom download path per file
-			err := downloadFile(bucket, harborConfig.S3.BasePath, harborConfig.DownloadPath, value)
+			err := downloadFile(bucket, harborConfig.S3.BasePath, fullDownloadPath, value)
 
 			if err != nil {
 				return err

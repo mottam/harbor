@@ -44,7 +44,8 @@ Usage:
 Options:
   -h, --help                    Show this screen.
   -v, --version                 Show version.
-  --list-variables         Parses harbor.yml and prints out every ${KEY} found.
+  --project-path <path>         Project source files path.
+  --list-variables              Parses harbor.yml and prints out every ${KEY} found.
   -e KEY=VALUE                  Replaces every ${KEY} in harbor.yml with VALUE
   --debug                       Dry-run and print command executions.
   --no-download                 Prevents downloading files from S3.
@@ -68,8 +69,13 @@ Options:
 	dockerOpts, _ := arguments["--docker-opts"].(string)
 	noLatestTagFlag := arguments["--no-latest-tag"].(bool)
 
+	projectPath := "."
+	if (arguments["--project-path"] != nil) {
+		projectPath = arguments["--project-path"].(string)
+	}
+
 	if listVariablesFlag {
-		listVariables()
+		listVariables(projectPath)
 	}
 
 	cliConfigVars, err := commandline.NewConfigVarsMap(configVars)
@@ -77,8 +83,9 @@ Options:
 		checkError(err)
 	}
 
-	harborConfig, err := config.Load(cliConfigVars)
+	harborConfig, err := config.Load(cliConfigVars, projectPath)
 	checkError(err)
+
 
 	config.Options.Debug = debugFlag
 	config.Options.DockerOpts = dockerOpts
@@ -96,13 +103,13 @@ Options:
 	}
 
 	if !noDockerFlag {
-		err = docker.Build(harborConfig.ImageTag, harborConfig.Tags)
+		err = docker.Build(harborConfig.ImageTag, harborConfig.Tags, harborConfig.ProjectPath)
 		checkError(err)
 	}
 }
 
-func listVariables() {
-	harborConfigFile, err := config.LoadFile()
+func listVariables(projectPath string) {
+	harborConfigFile, err := config.LoadFile(projectPath)
 	if err != nil {
 		checkError(err)
 	}
