@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/victorcampos/harbor/commandline"
+	"github.com/elo7/harbor/commandline"
 	"regexp"
 	"strings"
 )

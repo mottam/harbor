@@ -2,7 +2,7 @@ package execute
 
 import (
 	"fmt"
-	"github.com/victorcampos/harbor/config"
+	"github.com/elo7/harbor/config"
 	"os"
 	"os/exec"
 	"strings"

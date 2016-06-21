@@ -2,8 +2,8 @@ package docker
 
 import (
 	"fmt"
-	"github.com/victorcampos/harbor/config"
-	"github.com/victorcampos/harbor/execute"
+	"github.com/elo7/harbor/config"
+	"github.com/elo7/harbor/execute"
 	"os"
 	"time"
 )

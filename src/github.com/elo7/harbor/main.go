@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/docopt/docopt-go"
-	"github.com/victorcampos/harbor/commandline"
-	"github.com/victorcampos/harbor/config"
-	"github.com/victorcampos/harbor/download"
-	"github.com/victorcampos/harbor/execute"
-	"github.com/victorcampos/harbor/execute/docker"
+	"github.com/elo7/harbor/commandline"
+	"github.com/elo7/harbor/config"
+	"github.com/elo7/harbor/download"
+	"github.com/elo7/harbor/execute"
+	"github.com/elo7/harbor/execute/docker"
 	"os"
 )
 

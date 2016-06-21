@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/goamz/goamz/aws"
 	"github.com/goamz/goamz/s3"
-	"github.com/victorcampos/harbor/config"
+	"github.com/elo7/harbor/config"
 	"io/ioutil"
 	"os"
 	"path/filepath"

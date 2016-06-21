@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/victorcampos/harbor/commandline"
+	"github.com/elo7/harbor/commandline"
 	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
 )
