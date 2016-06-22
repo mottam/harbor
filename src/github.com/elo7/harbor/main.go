@@ -103,7 +103,7 @@ Options:
 	}
 
 	if !noDockerFlag {
-		err = docker.Build(harborConfig.ImageTag, harborConfig.Tags, harborConfig.ProjectPath)
+		err = docker.Build(harborConfig)
 		checkError(err)
 	}
 }

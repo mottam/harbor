@@ -7,7 +7,9 @@ import (
 	"time"
 )
 
-func Build(imageName string, tags []string, projectPath string) error {
+func Build(harborConfig config.HarborConfig) error {
+
+	tags := harborConfig.Tags
 
 	if len(tags) == 0 {
 		timeBasedTag := createTimeBasedVersion(time.Now())
@@ -18,9 +20,9 @@ func Build(imageName string, tags []string, projectPath string) error {
 		tags = append([]string{"latest"}, tags...)
 	}
 
-	imageWithTagsList := createImageWithTagsList(imageName, tags)
+	imageWithTagsList := createImageWithTagsList(harborConfig.ImageTag, tags)
 
-	if err := runDockerCommand("build", "-t", imageWithTagsList[0], projectPath); err != nil {
+	if err := runDockerCommand("build", "-t", imageWithTagsList[0], harborConfig.ProjectPath); err != nil {
 		return err
 	}
 
