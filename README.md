@@ -23,6 +23,7 @@ Harbor looks up a file named harbor.yml in the same directory where run from, ha
  s3:
    bucket: <base bucket to download files from>
    basepath: <inside the bucket the root path for files to be downloaded>
+   region: <[optional] region of the bucket, default us-east-1>
  files:
    - s3path: <path to file in S3 after [s3.bucket]/[s3.basepath]>
      filename: <local path + name of the file, will be downloaded into [downloadpath]/[localname]>
@@ -57,3 +58,17 @@ Options:
 
 ### Templating in harbor.yml
 You can use ${<KEY>} as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
+
+## Building (Linux/MAC)
+- Install Go >= 1.5
+- Clone this repository
+
+`git clone https://github.com/elo7/harbor.git`
+- Run the following commands
+```
+cd harbor
+export GOPATH=<full_path_to_this_directory>
+```
+- Set _GOOS_ and _GOARCH_ variables according to your [plataform](https://golang.org/doc/install/source#environment) and run the following command
+```
+env GOOS=<operating_system> GOARCH=<architecture> go build -v -o <output_filename>
