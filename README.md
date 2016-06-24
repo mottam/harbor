@@ -58,3 +58,17 @@ Options:
 
 ### Templating in harbor.yml
 You can use ${<KEY>} as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
+
+## Building (Linux/MAC)
+- Install Go >= 1.5
+- Clone this repository
+
+`git clone https://github.com/elo7/harbor.git`
+- Run the following commands
+```
+cd harbor
+export GOPATH=<full_path_to_this_directory>
+```
+- Set _GOOS_ and _GOARCH_ variables according to your [plataform](https://golang.org/doc/install/source#environment) and run the following command
+```
+env GOOS=<operating_system> GOARCH=<architecture> go build -v -o <output_filename>
