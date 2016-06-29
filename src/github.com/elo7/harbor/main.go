@@ -37,13 +37,14 @@ Harbor looks up a file named harbor.yml in the same directory where run from, ha
 Usage:
   harbor -h | --help
   harbor --version
-  harbor --list-variables
+  harbor --list-variables [--project-path <path>] [--config <name>]
   harbor [-e KEY=VALUE]... [options]
   harbor [options]
 
 Options:
   -h, --help                    Show this screen.
   -v, --version                 Show version.
+  --config <name>               Path to config file. By default, Harbor looks up for 'harbor.yml' in the current directory, or in the project path (when --project-path is passed).
   --project-path <path>         Project source files path.
   --list-variables              Parses harbor.yml and prints out every ${KEY} found.
   -e KEY=VALUE                  Replaces every ${KEY} in harbor.yml with VALUE
@@ -70,12 +71,17 @@ Options:
 	noLatestTagFlag := arguments["--no-latest-tag"].(bool)
 
 	projectPath := "."
-	if (arguments["--project-path"] != nil) {
+	if arguments["--project-path"] != nil {
 		projectPath = arguments["--project-path"].(string)
 	}
 
+	configFile := projectPath + "/harbor.yml"
+	if arguments["--config"] != nil {
+		configFile = arguments["--config"].(string)
+	}
+
 	if listVariablesFlag {
-		listVariables(projectPath)
+		listVariables(configFile)
 	}
 
 	cliConfigVars, err := commandline.NewConfigVarsMap(configVars)
@@ -83,9 +89,8 @@ Options:
 		checkError(err)
 	}
 
-	harborConfig, err := config.Load(cliConfigVars, projectPath)
+	harborConfig, err := config.Load(cliConfigVars, projectPath, configFile)
 	checkError(err)
-
 
 	config.Options.Debug = debugFlag
 	config.Options.DockerOpts = dockerOpts
@@ -108,15 +113,15 @@ Options:
 	}
 }
 
-func listVariables(projectPath string) {
-	harborConfigFile, err := config.LoadFile(projectPath)
+func listVariables(configFile string) {
+	harborConfigFile, err := config.LoadFile(configFile)
 	if err != nil {
 		checkError(err)
 	}
 
 	variablesFound := config.ReadEnv(harborConfigFile)
 
-	fmt.Printf("--- Found %d variables in harbor.yml\n", len(variablesFound))
+	fmt.Printf("--- Found %d variables in %s\n", len(variablesFound), configFile)
 
 	for _, variable := range variablesFound {
 		fmt.Printf("---   Found: %s\n", variable)

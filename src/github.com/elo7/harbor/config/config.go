@@ -26,7 +26,7 @@ type HarborConfig struct {
 	S3            struct {
 		Bucket   string
 		BasePath string
-		Region	 string
+		Region   string
 	}
 	DownloadPath string `yaml:",omitempty"`
 	ProjectPath  string `yaml:",omitempty"`
@@ -34,17 +34,20 @@ type HarborConfig struct {
 	Commands     []string
 }
 
-func Load(cliConfigVars commandline.ConfigVarsMap, projectPath string) (HarborConfig, error) {
+func Load(cliConfigVars commandline.ConfigVarsMap, projectPath string, configFile string) (HarborConfig, error) {
 	harborConfig := HarborConfig{}
 
-	configFile, err := LoadFile(projectPath)
+	// Loads config file contents
+	config, err := LoadFile(configFile)
 	if err != nil {
 		return harborConfig, err
 	}
 
-	configFile = SetEnv(cliConfigVars, configFile)
+	// Replaces variables (${KEY} format) from -e parameter
+	config = SetEnv(cliConfigVars, config)
 
-	err = yaml.Unmarshal(configFile, &harborConfig)
+	// Parses file content (YAML expected)
+	err = yaml.Unmarshal(config, &harborConfig)
 
 	harborConfig.ProjectPath = projectPath
 
@@ -55,6 +58,6 @@ func Load(cliConfigVars commandline.ConfigVarsMap, projectPath string) (HarborCo
 	return harborConfig, nil
 }
 
-func LoadFile(projectPath string) ([]byte, error) {
-	return ioutil.ReadFile(projectPath + "/harbor.yml")
+func LoadFile(configFile string) ([]byte, error) {
+	return ioutil.ReadFile(configFile)
 }

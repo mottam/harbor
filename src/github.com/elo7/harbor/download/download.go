@@ -1,14 +1,14 @@
 package download
 
 import (
+	"errors"
 	"fmt"
+	"github.com/elo7/harbor/config"
 	"github.com/goamz/goamz/aws"
 	"github.com/goamz/goamz/s3"
-	"github.com/elo7/harbor/config"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"errors"
 )
 
 func FromS3(harborConfig config.HarborConfig) error {
