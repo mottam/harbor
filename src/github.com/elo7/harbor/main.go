@@ -11,12 +11,13 @@ import (
 	"os"
 )
 
-const VERSION = "0.2.0"
+const VERSION = "0.2.1"
 
 func main() {
 	usage := `Harbor, a Docker wrapper
 
-Harbor looks up a file named harbor.yml in the same directory where run from, harbor.yml structure is:
+Harbor takes a YAML configuration file with the following structure.
+
  imagetag: <tag to be used on 'docker build'>
  tags:
    - <YAML array of custom tags to create and push into registry>
@@ -34,18 +35,20 @@ Harbor looks up a file named harbor.yml in the same directory where run from, ha
 
  You can use ${<KEY>} as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
 
+ By default, it looks up a file named harbor.yml in the current directory, but you can specify another path.
+
 Usage:
   harbor -h | --help
   harbor --version
-  harbor --list-variables
   harbor [-e KEY=VALUE]... [options]
   harbor [options]
 
 Options:
   -h, --help                    Show this screen.
   -v, --version                 Show version.
+  --config <name>               Path to config file. By default, Harbor looks up for 'harbor.yml' in the current directory, or in the project path (when --project-path is passed).
   --project-path <path>         Project source files path.
-  --list-variables              Parses harbor.yml and prints out every ${KEY} found.
+  --list-variables              Parses Harbor config file, prints out every ${KEY} found and exits, without building anything.
   -e KEY=VALUE                  Replaces every ${KEY} in harbor.yml with VALUE
   --debug                       Dry-run and print command executions.
   --no-download                 Prevents downloading files from S3.
@@ -70,12 +73,17 @@ Options:
 	noLatestTagFlag := arguments["--no-latest-tag"].(bool)
 
 	projectPath := "."
-	if (arguments["--project-path"] != nil) {
+	if arguments["--project-path"] != nil {
 		projectPath = arguments["--project-path"].(string)
 	}
 
+	configFile := projectPath + "/harbor.yml"
+	if arguments["--config"] != nil {
+		configFile = arguments["--config"].(string)
+	}
+
 	if listVariablesFlag {
-		listVariables(projectPath)
+		listVariables(configFile)
 	}
 
 	cliConfigVars, err := commandline.NewConfigVarsMap(configVars)
@@ -83,9 +91,8 @@ Options:
 		checkError(err)
 	}
 
-	harborConfig, err := config.Load(cliConfigVars, projectPath)
+	harborConfig, err := config.Load(cliConfigVars, projectPath, configFile)
 	checkError(err)
-
 
 	config.Options.Debug = debugFlag
 	config.Options.DockerOpts = dockerOpts
@@ -108,15 +115,15 @@ Options:
 	}
 }
 
-func listVariables(projectPath string) {
-	harborConfigFile, err := config.LoadFile(projectPath)
+func listVariables(configFile string) {
+	harborConfigFile, err := config.LoadFile(configFile)
 	if err != nil {
 		checkError(err)
 	}
 
 	variablesFound := config.ReadEnv(harborConfigFile)
 
-	fmt.Printf("--- Found %d variables in harbor.yml\n", len(variablesFound))
+	fmt.Printf("--- Found %d variables in %s\n", len(variablesFound), configFile)
 
 	for _, variable := range variablesFound {
 		fmt.Printf("---   Found: %s\n", variable)
