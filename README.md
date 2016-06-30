@@ -33,16 +33,15 @@ Harbor takes a YAML configuration file with the following structure.
  commands:
    - <YAML array containing shell commands (currently /bin/bash) to be run before 'docker build'>
 ```
- 
+
 You can use `${<KEY>}` as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
 
-By default, it looks up a file named `harbor.yml` in the current directory, but you can specify another path. 
+By default, it looks up a file named `harbor.yml` in the current directory, but you can specify another path.
 
 ```
 Usage:
   harbor -h | --help
   harbor --version
-  harbor --list-variables [--project-path <path>] [--config <name>]
   harbor [-e KEY=VALUE]... [options]
   harbor [options]
 
@@ -51,7 +50,7 @@ Options:
   -v, --version                 Show version.
   --config <name>               Path to config file. By default, Harbor looks up for 'harbor.yml' in the current directory, or in the project path (when --project-path is passed).
   --project-path <path>         Project source files path.
-  --list-variables              Parses harbor.yml and prints out every ${KEY} found.
+  --list-variables              Parses Harbor config file, prints out every ${KEY} found and exits, without building anything.
   -e KEY=VALUE                  Replaces every ${KEY} in harbor.yml with VALUE
   --debug                       Dry-run and print command executions.
   --no-download                 Prevents downloading files from S3.
@@ -61,7 +60,7 @@ Options:
   --docker-opts=<DOCKER_OPTS>   Will be appended to the base docker command (ex.: 'docker <docker-opts> command').
   --no-latest-tag               Do not build image tagging as 'latest',
                                 will use the first tag in 'tags' list from harbor.yml or
-                                generate a timestamped tag if no 'tags' list exists.`
+                                generate a timestamped tag if no 'tags' list exists.
 ```
 
 ### Templating in harbor.yml
