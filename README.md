@@ -65,7 +65,7 @@ Options:
 ```
 
 ### Templating in harbor.yml
-You can use ${<KEY>} as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
+You can use `${<KEY>}` as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
 
 ## Building (Linux/MAC)
 - Install Go >= 1.5
