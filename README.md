@@ -34,7 +34,7 @@ Harbor takes a YAML configuration file with the following structure.
    - <YAML array containing shell commands (currently /bin/bash) to be run before 'docker build'>
 ```
  
-You can use ${<KEY>} as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
+You can use `${<KEY>}` as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
 
 By default, it looks up a file named `harbor.yml` in the current directory, but you can specify another path. 
 
