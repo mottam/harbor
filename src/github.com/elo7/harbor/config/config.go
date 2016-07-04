@@ -32,6 +32,7 @@ type HarborConfig struct {
 	ProjectPath  string `yaml:",omitempty"`
 	Files        []HarborFile
 	Commands     []string
+	BuildArgs    map[string]string
 }
 
 func Load(cliConfigVars commandline.ConfigVarsMap, projectPath string, configFile string) (HarborConfig, error) {

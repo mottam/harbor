@@ -8,7 +8,7 @@ import (
 )
 
 func Build(harborConfig config.HarborConfig) error {
-
+	var arguments []string
 	tags := harborConfig.Tags
 
 	if len(tags) == 0 {
@@ -21,8 +21,17 @@ func Build(harborConfig config.HarborConfig) error {
 	}
 
 	imageWithTagsList := createImageWithTagsList(harborConfig.ImageTag, tags)
+	arguments = append(arguments, "build", "-t", imageWithTagsList[0])
+	buildArgs := harborConfig.BuildArgs
 
-	if err := runDockerCommand("build", "-t", imageWithTagsList[0], harborConfig.ProjectPath); err != nil {
+	if len(buildArgs) > 0 {
+		for name, value := range buildArgs {
+			arguments = append(arguments, "--build-arg", name + "=" + value)
+		}
+	}
+
+	arguments = append(arguments, harborConfig.ProjectPath)
+	if err := runDockerCommand(arguments...); err != nil {
 		return err
 	}
 

@@ -32,6 +32,8 @@ Harbor takes a YAML configuration file with the following structure.
      permission: <[optional] file permissions, default 0644>
  commands:
    - <YAML array containing shell commands (currently /bin/bash) to be run before 'docker build'>
+ buildargs:
+   <KEY>:<VALUE pair to be used as --build-arg KEY=VALUE>
 ```
 
 You can use `${<KEY>}` as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
