@@ -1,3 +1,9 @@
-# Ignores goxc local configurations
-.goxc.local.json
 build/
+bin/
+pkg/
+
+src/github.com/docopt/
+src/github.com/goamz/
+src/github.com/vaughan0/
+src/gopkg.in/
+
