@@ -62,7 +62,7 @@ func createTimeBasedVersion(t time.Time) string {
 }
 
 func createTag(fromTag string, toTag string) error {
-	if err := runDockerCommand("tag", "-f", fromTag, toTag); err != nil {
+	if err := runDockerCommand("tag", fromTag, toTag); err != nil {
 		return err
 	}
 
