@@ -26,7 +26,7 @@ func Build(harborConfig config.HarborConfig) error {
 
 	if len(buildArgs) > 0 {
 		for name, value := range buildArgs {
-			arguments = append(arguments, "--build-arg", name + "=" + value)
+			arguments = append(arguments, "--build-arg", name+"="+value)
 		}
 	}
 
@@ -71,7 +71,15 @@ func createTimeBasedVersion(t time.Time) string {
 }
 
 func createTag(fromTag string, toTag string) error {
-	if err := runDockerCommand("tag", fromTag, toTag); err != nil {
+	var arguments []string
+
+	if CompareDockerVersion("1.10.0") {
+		arguments = append(arguments, "tag", fromTag, toTag)
+	} else {
+		arguments = append(arguments, "tag", "-f", fromTag, toTag)
+	}
+
+	if err := runDockerCommand(arguments...); err != nil {
 		return err
 	}
 
