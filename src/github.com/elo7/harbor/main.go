@@ -112,6 +112,15 @@ Options:
 	}
 
 	if !noDockerFlag {
+
+		// Caso docker não existir ou estiver mal-configurado, falho aqui
+		if dockerVersion, err := docker.GetDockerVersion(); err != nil {
+			fmt.Printf("There was a problem running the docker version command.\n")
+			os.Exit(1)
+		} else {
+			fmt.Printf("Your Docker client version: %s\n", dockerVersion)
+		}
+
 		err = docker.Build(harborConfig)
 		checkError(err)
 	}
