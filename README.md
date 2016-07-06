@@ -77,7 +77,7 @@ You can use `${<KEY>}` as a placeholder in harbor.yml to be replaced by the valu
 ```
 cd harbor
 export GOPATH=$(pwd)
-cd harbor/src/github.com/elo7/harbor
+cd src/github.com/elo7/harbor
 ```
 - Set _GOOS_ and _GOARCH_ variables according to your [plataform](https://golang.org/doc/install/source#environment) and run the following command
 ```
