@@ -5,5 +5,6 @@ pkg/
 src/github.com/docopt/
 src/github.com/goamz/
 src/github.com/vaughan0/
+src/github.com/hashicorp/
 src/gopkg.in/
 
