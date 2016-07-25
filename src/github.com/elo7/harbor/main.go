@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-const VERSION = "0.2.6"
+const VERSION = "0.2.7"
 
 func main() {
 	usage := `Harbor, a Docker wrapper
