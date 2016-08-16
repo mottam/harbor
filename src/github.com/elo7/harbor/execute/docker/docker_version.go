@@ -7,7 +7,7 @@ import (
 )
 
 func GetDockerVersion() (dockerVersion string, err error) {
-	output, err := exec.Command("docker", "version", "--format='{{.Client.Version}}'").CombinedOutput()
+	output, err := exec.Command("docker", "version", "--format={{.Client.Version}}").CombinedOutput()
 	return strings.TrimSpace(string(output)), err
 }
 
