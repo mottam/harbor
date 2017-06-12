@@ -82,3 +82,4 @@ cd src/github.com/elo7/harbor
 - Set _GOOS_ and _GOARCH_ variables according to your [plataform](https://golang.org/doc/install/source#environment) and run the following command
 ```
 env GOOS=<operating_system> GOARCH=<architecture> go build -v -o <output_filename>
+
