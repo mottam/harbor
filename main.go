@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	"github.com/docopt/docopt-go"
 	"github.com/elo7/harbor/commandline"
 	"github.com/elo7/harbor/config"
 	"github.com/elo7/harbor/download"
 	"github.com/elo7/harbor/execute"
 	"github.com/elo7/harbor/execute/docker"
-	"os"
 )
 
 const VERSION = "0.2.8"
@@ -89,9 +91,7 @@ Options:
 	}
 
 	cliConfigVars, err := commandline.NewConfigVarsMap(configVars)
-	if err != nil {
-		checkError(err)
-	}
+	checkError(err)
 
 	harborConfig, err := config.Load(cliConfigVars, projectPath, configFile)
 	checkError(err)
@@ -127,10 +127,8 @@ Options:
 }
 
 func listVariables(configFile string) {
-	harborConfigFile, err := config.LoadFile(configFile)
-	if err != nil {
-		checkError(err)
-	}
+	harborConfigFile, err := ioutil.ReadFile(configFile)
+	checkError(err)
 
 	variablesFound := config.ReadEnv(harborConfigFile)
 

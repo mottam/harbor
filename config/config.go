@@ -1,11 +1,13 @@
 package config
 
 import (
+	"io/ioutil"
+
 	"github.com/elo7/harbor/commandline"
 	yaml "gopkg.in/yaml.v2"
-	"io/ioutil"
 )
 
+//Options harbor options
 var Options struct {
 	Debug        bool
 	DockerOpts   string
@@ -13,12 +15,14 @@ var Options struct {
 	NoLatestTag  bool
 }
 
+//HarborFile harbor file config structure
 type HarborFile struct {
 	S3Path     string
 	FileName   string
 	Permission int
 }
 
+//HarborConfig harbor config structure
 type HarborConfig struct {
 	ImageTag      string
 	CliConfigVars commandline.ConfigVarsMap
@@ -35,30 +39,23 @@ type HarborConfig struct {
 	BuildArgs    map[string]string
 }
 
+//Load load configs from file
 func Load(cliConfigVars commandline.ConfigVarsMap, projectPath string, configFile string) (HarborConfig, error) {
-	harborConfig := HarborConfig{}
-
 	// Loads config file contents
-	config, err := LoadFile(configFile)
+	config, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		return harborConfig, err
+		return HarborConfig{}, err
 	}
+
+	harborConfig := &HarborConfig{}
 
 	// Replaces variables (${KEY} format) from -e parameter
-	config = SetEnv(cliConfigVars, config)
+	config = setEnv(cliConfigVars, config)
 
 	// Parses file content (YAML expected)
-	err = yaml.Unmarshal(config, &harborConfig)
-
-	harborConfig.ProjectPath = projectPath
-
-	if err != nil {
-		return harborConfig, err
+	if err = yaml.Unmarshal(config, harborConfig); err != nil {
+		return HarborConfig{}, err
 	}
-
-	return harborConfig, nil
-}
-
-func LoadFile(configFile string) ([]byte, error) {
-	return ioutil.ReadFile(configFile)
+	harborConfig.ProjectPath = projectPath
+	return *harborConfig, nil
 }
