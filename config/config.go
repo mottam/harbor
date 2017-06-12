@@ -20,23 +20,39 @@ type HarborFile struct {
 	S3Path     string
 	FileName   string
 	Permission int
+	Repository string
 }
 
 //HarborConfig harbor config structure
 type HarborConfig struct {
-	ImageTag      string
-	CliConfigVars commandline.ConfigVarsMap
-	Tags          []string
-	S3            struct {
-		Bucket   string
-		BasePath string
-		Region   string
+	ImageTag       string
+	CliConfigVars  commandline.ConfigVarsMap
+	Tags           []string
+	S3             S3HarborConfig //retrocompatibility
+	S3Repositories S3HarborRepositoriesConfig
+	DownloadPath   string `yaml:",omitempty"`
+	ProjectPath    string `yaml:",omitempty"`
+	Files          []HarborFile
+	Commands       []string
+	BuildArgs      map[string]string
+}
+
+//S3HarborConfig harbor s3 config structure
+type S3HarborConfig struct {
+	Bucket   string
+	BasePath string
+	Region   string
+}
+
+//S3HarborRepositoriesConfig map with harbor s3 config structure
+type S3HarborRepositoriesConfig map[string]S3HarborConfig
+
+//Get get harbor s3 config, return default if not found
+func (c S3HarborRepositoriesConfig) Get(key string) S3HarborConfig {
+	if result, exists := c[key]; exists {
+		return result
 	}
-	DownloadPath string `yaml:",omitempty"`
-	ProjectPath  string `yaml:",omitempty"`
-	Files        []HarborFile
-	Commands     []string
-	BuildArgs    map[string]string
+	return c["default"]
 }
 
 //Load load configs from file
@@ -57,5 +73,10 @@ func Load(cliConfigVars commandline.ConfigVarsMap, projectPath string, configFil
 		return HarborConfig{}, err
 	}
 	harborConfig.ProjectPath = projectPath
+	if harborConfig.S3Repositories == nil { //S3 -> S3Repositories retrocompatibility
+		harborConfig.S3Repositories = make(S3HarborRepositoriesConfig)
+		harborConfig.S3Repositories["default"] = harborConfig.S3
+	}
+
 	return *harborConfig, nil
 }
