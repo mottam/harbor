@@ -10,4 +10,4 @@ if [ -z "$VERSION" ]; then
 fi
 
 echo "building harbor v$VERSION for os[$COMPILE_OS] arch[$COMPILE_ARCH]"
-docker run --rm -i -v "$(pwd)":/gopath/src/github.com/elo7/harbor -e "GOPATH=/gopath" -w /gopath/src/github.com/elo7/harbor golang:latest sh -c "go version && go test ./... && CGO_ENABLED=0 GOOS=$COMPILE_OS GOARCH=$COMPILE_ARCH go build -v -a -installsuffix cgo --ldflags=\"-s\" -o harbor-v$VERSION-$COMPILE_OS-$COMPILE_ARCH ."
+docker run --rm -i -v "$(pwd)":/gopath/src/github.com/elo7/harbor -e "GOPATH=/gopath" -w /gopath/src/github.com/elo7/harbor golang:latest sh -c "pwd && go version && go test ./... && CGO_ENABLED=0 GOOS=$COMPILE_OS GOARCH=$COMPILE_ARCH go build -v -a -installsuffix cgo --ldflags=\"-s\" -o harbor-v$VERSION-$COMPILE_OS-$COMPILE_ARCH ."
