@@ -24,12 +24,12 @@ Harbor takes a YAML configuration file with the following structure.
  downloadpath: <local root path to download files into>
  s3: #deprecated on version 0.3
    bucket: <base bucket to download files from>
-   basepath: <inside the bucket the root path for files to be downloaded>
+   basepath: <[optional] inside the bucket the root path for files to be downloaded>
    region: <[optional] region of the bucket, default us-east-1>
  s3repositories: #support after version 0.3, map of string and s3 repository
    default: #[mandatory] used if no repository is defined on file
      bucket: <base bucket to download files from>
-     basepath: <inside the bucket the root path for files to be downloaded>
+     basepath: <[optional] inside the bucket the root path for files to be downloaded>
      region: <[optional] region of the bucket, default us-east-1>
  files:
    - s3path: <path to file in S3 after [s3.bucket]/[s3.basepath]>
