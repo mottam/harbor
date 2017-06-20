@@ -22,14 +22,20 @@ Harbor takes a YAML configuration file with the following structure.
  tags:
    - <YAML array of custom tags to create and push into registry>
  downloadpath: <local root path to download files into>
- s3:
+ s3: #deprecated on version 0.3
    bucket: <base bucket to download files from>
-   basepath: <inside the bucket the root path for files to be downloaded>
+   basepath: <[optional] inside the bucket the root path for files to be downloaded>
    region: <[optional] region of the bucket, default us-east-1>
+ s3repositories: #support after version 0.3, map of string and s3 repository
+   default: #[mandatory] used if no repository is defined on file
+     bucket: <base bucket to download files from>
+     basepath: <[optional] inside the bucket the root path for files to be downloaded>
+     region: <[optional] region of the bucket, default us-east-1>
  files:
    - s3path: <path to file in S3 after [s3.bucket]/[s3.basepath]>
      filename: <local path + name of the file, will be downloaded into [downloadpath]/[localname]>
      permission: <[optional] file permissions, default 0644>
+     repository: <[optional] s3 repository used, default 'default'>
  commands:
    - <YAML array containing shell commands (currently /bin/bash) to be run before 'docker build'>
  buildargs:
@@ -69,16 +75,15 @@ Options:
 You can use `${<KEY>}` as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
 
 ## Building (Linux/MAC)
-- Install Go >= 1.5
-- Clone this repository
+use _OS_ and _ARCH_ according with [golang doc](https://golang.org/doc/install/source#environment)
 
-`git clone https://github.com/elo7/harbor.git`
-- Run the following commands
-```
+**note:** requires docker
+
+```bash
+#clone repo
+git clone https://github.com/elo7/harbor.git
 cd harbor
-export GOPATH=$(pwd)
-cd src/github.com/elo7/harbor
+
+#build
+./build.sh <OS> <ARCH>
 ```
-- Set _GOOS_ and _GOARCH_ variables according to your [plataform](https://golang.org/doc/install/source#environment) and run the following command
-```
-env GOOS=<operating_system> GOARCH=<architecture> go build -v -o <output_filename>

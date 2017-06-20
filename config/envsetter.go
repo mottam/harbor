@@ -2,12 +2,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/elo7/harbor/commandline"
 	"regexp"
 	"strings"
+
+	"github.com/elo7/harbor/commandline"
 )
 
-func SetEnv(cliConfigVars commandline.ConfigVarsMap, configString []byte) []byte {
+func setEnv(cliConfigVars commandline.ConfigVarsMap, configString []byte) []byte {
 	str := string(configString)
 
 	// FIXME: Parallelize replace
@@ -18,8 +19,7 @@ func SetEnv(cliConfigVars commandline.ConfigVarsMap, configString []byte) []byte
 	return []byte(str)
 }
 
+//ReadEnv read envs from file
 func ReadEnv(configString []byte) []string {
-	matcher := regexp.MustCompile(`\$\{[a-zA-Z0-9_\-]+\}`)
-
-	return matcher.FindAllString(string(configString), -1)
+	return regexp.MustCompile(`\$\{[a-zA-Z0-9_\-]+\}`).FindAllString(string(configString), -1)
 }
