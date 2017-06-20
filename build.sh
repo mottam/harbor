@@ -26,6 +26,7 @@ function execDocker() {
 }
 
 function compress() {
+	echo "[compressing] creating harbor_$1_$2_$3.tar.gz"
 	mkdir gzout
 	mv harbor-v$1-$2-$3 gzout/harbor
 	tar -z -C gzout -cvf harbor_$1_$2_$3.tar.gz harbor
@@ -50,6 +51,8 @@ if [ -z "$GOEXISTS" ]; then
 else
     execDocker "$BUILD_CMD"
 fi
+
+echo "output file: harbor-v$VERSION-$COMPILE_OS-$COMPILE_ARCH"
 
 if [[ "$OUTPUT" == "gz" ]]; then
 	compress $VERSION $COMPILE_OS $COMPILE_ARCH
