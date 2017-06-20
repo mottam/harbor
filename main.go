@@ -14,7 +14,7 @@ import (
 )
 
 //VERSION harbor version
-const VERSION = "0.2.8"
+const VERSION = "0.3.0"
 
 func main() {
 	usage := `Harbor, a Docker wrapper
