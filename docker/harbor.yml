@@ -1,0 +1,22 @@
+imagetag: registry.docker.elo7aws.com.br/${REPO_NAME}
+tags:
+  - ${HARBOR_VERSION}-alpine${ALPINE_VERSION}
+buildargs:
+  HARBOR_VERSION: ${HARBOR_VERSION}
+  ALPINE_VERSION: ${ALPINE_VERSION}
+
+s3:
+ bucket: data.elo7.com.br
+ region: us-east-1
+ basepath: configuration-sa-east/docker-builds/ssl
+files:
+ - s3path: ca.pem
+   filename: keys/ca.pem
+   permission: 400
+ - s3path: cert.pem
+   filename: keys/cert.pem
+   permission: 400
+ - s3path: key.pem
+   filename: keys/key.pem
+   permission: 400
+

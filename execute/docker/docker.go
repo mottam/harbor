@@ -2,14 +2,14 @@ package docker
 
 import (
 	"fmt"
-	"github.com/victorcampos/harbor/config"
-	"github.com/victorcampos/harbor/execute"
-	"os"
+	"github.com/elo7/harbor/config"
+	"github.com/elo7/harbor/execute"
 	"time"
 )
 
-func Build(imageName string, tags []string) error {
-	cwd, _ := os.Getwd()
+func Build(harborConfig config.HarborConfig) error {
+	var arguments []string
+	tags := harborConfig.Tags
 
 	if len(tags) == 0 {
 		timeBasedTag := createTimeBasedVersion(time.Now())
@@ -20,9 +20,18 @@ func Build(imageName string, tags []string) error {
 		tags = append([]string{"latest"}, tags...)
 	}
 
-	imageWithTagsList := createImageWithTagsList(imageName, tags)
+	imageWithTagsList := createImageWithTagsList(harborConfig.ImageTag, tags)
+	arguments = append(arguments, "build", "-t", imageWithTagsList[0])
+	buildArgs := harborConfig.BuildArgs
 
-	if err := runDockerCommand("build", "-t", imageWithTagsList[0], cwd); err != nil {
+	if len(buildArgs) > 0 {
+		for name, value := range buildArgs {
+			arguments = append(arguments, "--build-arg", name+"="+value)
+		}
+	}
+
+	arguments = append(arguments, harborConfig.ProjectPath)
+	if err := runDockerCommand(arguments...); err != nil {
 		return err
 	}
 
@@ -62,7 +71,15 @@ func createTimeBasedVersion(t time.Time) string {
 }
 
 func createTag(fromTag string, toTag string) error {
-	if err := runDockerCommand("tag", "-f", fromTag, toTag); err != nil {
+	var arguments []string
+
+	if CompareDockerVersion("1.10.0") {
+		arguments = append(arguments, "tag", fromTag, toTag)
+	} else {
+		arguments = append(arguments, "tag", "-f", fromTag, toTag)
+	}
+
+	if err := runDockerCommand(arguments...); err != nil {
 		return err
 	}
 

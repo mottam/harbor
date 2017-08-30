@@ -2,68 +2,51 @@ package download
 
 import (
 	"fmt"
-	"github.com/goamz/goamz/aws"
-	"github.com/goamz/goamz/s3"
-	"github.com/victorcampos/harbor/config"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
+
+	"github.com/elo7/harbor/config"
+	"github.com/goamz/goamz/aws"
+	"github.com/goamz/goamz/s3"
 )
 
+//FromS3 get files from s3
 func FromS3(harborConfig config.HarborConfig) error {
-	fileListLength := len(harborConfig.Files)
-
-	if fileListLength > 0 {
-		bucket, err := getBucket(harborConfig.S3.Bucket)
-
-		if err != nil {
-			return err
-		}
-
-		fmt.Printf("--- Downloading from bucket: %s\r\n", harborConfig.S3.Bucket)
-		fmt.Printf("--- Files to be downloaded: %d\r\n", fileListLength)
-		fmt.Printf("--- Downloading to: %s\r\n", harborConfig.DownloadPath)
-		for key, value := range harborConfig.Files {
-			fmt.Printf("--- Downloading file %d of %d...\r\n", key+1, fileListLength)
-
-			// TODO: Enable custom download path per file
-			err := downloadFile(bucket, harborConfig.S3.BasePath, harborConfig.DownloadPath, value)
-
-			if err != nil {
-				return err
-			}
-		}
+	if len(harborConfig.Files) < 0 {
+		return nil
 	}
 
+	if err := checkAWSRegions(harborConfig.S3Repositories); err != nil {
+		return err
+	}
+
+	// region := aws.USEast
+	awsAuth, err := aws.GetAuth("", "", "", time.Time{})
+	if err != nil {
+		return err
+	}
+
+	downloadPath := fmt.Sprintf("%s/%s", harborConfig.ProjectPath, harborConfig.DownloadPath)
+	fmt.Printf("--- %d Files to be downloaded on path: %s\r\n", len(harborConfig.Files), downloadPath)
+
+	for _, file := range harborConfig.Files {
+		if err := downloadFile(awsAuth, harborConfig.S3Repositories.Get(file.Repository), file, downloadPath); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func getBucket(bucketName string) (*s3.Bucket, error) {
-	var bucket *s3.Bucket
-
-	awsAuthentication, err := aws.EnvAuth()
-	if err != nil {
-		return bucket, err
-	}
-
-	s3Connection := s3.New(awsAuthentication, aws.USEast)
-	bucket = s3Connection.Bucket(bucketName)
-	if err != nil {
-		return bucket, err
-	}
-
-	return bucket, nil
-}
-
-func downloadFile(bucket *s3.Bucket, s3BasePath string, downloadPath string, file config.HarborFile) error {
-	s3FilePath := filepath.Join(s3BasePath, file.S3Path)
+func downloadFile(awsAuth aws.Auth, s3config config.S3HarborConfig, file config.HarborFile, downloadPath string) error {
+	s3FilePath := filepath.Join(s3config.BasePath, file.S3Path)
 	outputFilePath := filepath.Join(downloadPath, file.FileName)
+	bucket := getBucket(s3config, awsAuth)
+
+	fmt.Printf("--- Downloading file %s from bucket %s (%s) to %s...\r\n", s3FilePath, bucket.Name, bucket.Region.Name, outputFilePath)
 	outputDirectory := filepath.Dir(outputFilePath)
-
 	os.MkdirAll(outputDirectory, 0755)
-
-	fmt.Printf("S3 Path: %s\r\n", s3FilePath)
-	fmt.Printf("File: %s\r\n", outputFilePath)
 
 	// FIXME: Use GetReader to stream file contents instead of loading all the file to memory before writing
 	contents, err := bucket.Get(s3FilePath)
@@ -88,4 +71,23 @@ func downloadFile(bucket *s3.Bucket, s3BasePath string, downloadPath string, fil
 	}
 
 	return nil
+}
+
+func checkAWSRegions(configs config.S3HarborRepositoriesConfig) error {
+	for name, config := range configs {
+		if config.Region != "" {
+			if _, exists := aws.Regions[config.Region]; !exists {
+				return fmt.Errorf("The region: %s is not valid on %s config", config.Region, name)
+			}
+		}
+	}
+	return nil
+}
+
+func getBucket(config config.S3HarborConfig, awsAuth aws.Auth) *s3.Bucket {
+	region := aws.USEast
+	if config.Region != "" {
+		region = aws.Regions[config.Region]
+	}
+	return s3.New(awsAuth, region).Bucket(config.Bucket)
 }

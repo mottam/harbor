@@ -14,35 +14,51 @@ At the time, Harbor main objectives are:
 + Execute `docker build`, `docker tag` and `docker push` to repository
 
 ## Usage
-Harbor looks up a file named harbor.yml in the same directory where run from, harbor.yml structure is:
-```
+
+Harbor takes a YAML configuration file with the following structure.
+
+```yaml
  imagetag: <tag to be used on 'docker build'>
  tags:
    - <YAML array of custom tags to create and push into registry>
  downloadpath: <local root path to download files into>
- s3:
+ s3: #deprecated on version 0.3
    bucket: <base bucket to download files from>
-   basepath: <inside the bucket the root path for files to be downloaded>
+   basepath: <[optional] inside the bucket the root path for files to be downloaded>
+   region: <[optional] region of the bucket, default us-east-1>
+ s3repositories: #support after version 0.3, map of string and s3 repository
+   default: #[mandatory] used if no repository is defined on file
+     bucket: <base bucket to download files from>
+     basepath: <[optional] inside the bucket the root path for files to be downloaded>
+     region: <[optional] region of the bucket, default us-east-1>
  files:
    - s3path: <path to file in S3 after [s3.bucket]/[s3.basepath]>
      filename: <local path + name of the file, will be downloaded into [downloadpath]/[localname]>
      permission: <[optional] file permissions, default 0644>
+     repository: <[optional] s3 repository used, default 'default'>
  commands:
    - <YAML array containing shell commands (currently /bin/bash) to be run before 'docker build'>
+ buildargs:
+   <KEY>:<VALUE pair to be used as --build-arg KEY=VALUE>
+```
 
- You can use ${<KEY>} as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
+You can use `${<KEY>}` as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
 
+By default, it looks up a file named `harbor.yml` in the current directory, but you can specify another path.
+
+```
 Usage:
   harbor -h | --help
   harbor --version
-  harbor --list-variables
   harbor [-e KEY=VALUE]... [options]
   harbor [options]
 
 Options:
   -h, --help                    Show this screen.
   -v, --version                 Show version.
-  --list-variables              Parses harbor.yml and prints out every ${KEY} found.
+  --config <name>               Path to config file. By default, Harbor looks up for 'harbor.yml' in the current directory, or in the project path (when --project-path is passed).
+  --project-path <path>         Project source files path.
+  --list-variables              Parses Harbor config file, prints out every ${KEY} found and exits, without building anything.
   -e KEY=VALUE                  Replaces every ${KEY} in harbor.yml with VALUE
   --debug                       Dry-run and print command executions.
   --no-download                 Prevents downloading files from S3.
@@ -56,4 +72,18 @@ Options:
 ```
 
 ### Templating in harbor.yml
-You can use ${<KEY>} as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
+You can use `${<KEY>}` as a placeholder in harbor.yml to be replaced by the value passed in a -e flag
+
+## Building (Linux/MAC)
+use _OS_ and _ARCH_ according with [golang doc](https://golang.org/doc/install/source#environment)
+
+**note:** requires docker
+
+```bash
+#clone repo
+git clone https://github.com/elo7/harbor.git
+cd harbor
+
+#build
+./build.sh <OS> <ARCH>
+```
